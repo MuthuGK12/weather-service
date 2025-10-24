@@ -1,0 +1,22 @@
+package com.weatherService.weather_service.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
+
+@Service
+public class WeatherService {
+
+    @Value("${weather.api.key}")
+    private String apiKey;  // Only here
+
+    private static final String BASE_URL = "https://api.weatherapi.com/v1/current.json";
+
+    public Map<String, Object> getWeatherByCity(String city) {
+        String url = BASE_URL + "?key=" + apiKey + "&q=" + city + "&aqi=no";
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(url, Map.class);
+    }
+}
