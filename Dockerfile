@@ -1,30 +1,27 @@
 # =============================
-#  STAGE 1: BUILD THE JAR
+#  BUILD STAGE
 # =============================
-FROM eclipse-temurin:21-jdk AS build
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-
-# Copy Maven wrapper
-COPY mvnw .
-# REMOVE: COPY .mvn .mvn    (because your project doesn’t have it)
 
 # Copy project files
 COPY pom.xml .
 COPY src ./src
 
-# Build jar
-RUN ./mvnw -q -DskipTests package
+# Build JAR using Maven inside Docker
+RUN mvn -q -DskipTests package
 
 
 # =============================
-#  STAGE 2: RUNTIME CONTAINER
+#  RUNTIME STAGE
 # =============================
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy jar from build stage
+# Copy only the final JAR
 COPY --from=build /app/target/*.jar app.jar
 
+# Expose your Spring Boot port
 EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
